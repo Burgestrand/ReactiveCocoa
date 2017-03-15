@@ -28,6 +28,26 @@ class KeyValueObservingSpec: QuickSpec {
 				expect(values) == [ 0, 1, 2 ]
 			}
 
+			it("should not send initial value if only new values are requested") {
+				let object = ObservableObject()
+				var values: [Int] = []
+
+				object.reactive
+					.values(forKeyPath: #keyPath(ObservableObject.rac_value), options: [.new])
+					.startWithValues { value in
+						expect(value).notTo(beNil())
+						values.append(value as! Int)
+				}
+
+				expect(values) == [ ]
+
+				object.rac_value = 1
+				expect(values) == [ 1 ]
+
+				object.rac_value = 2
+				expect(values) == [ 1, 2 ]
+			}
+
 			it("should sends the current value and then the changes for the key path, even if the value actually remains unchanged") {
 				let object = ObservableObject()
 				var values: [Int] = []

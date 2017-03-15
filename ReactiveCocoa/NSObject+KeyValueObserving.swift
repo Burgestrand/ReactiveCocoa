@@ -10,15 +10,16 @@ extension Reactive where Base: NSObject {
 	///
 	/// - parameters:
 	///   - keyPath: The key path of the property to be observed.
+	///   - options: KVO options, see `NSKeyValueObservingOptions` for more documentation.
 	///
 	/// - returns:
 	///   A producer emitting values of the property specified by the key path.
-	public func values(forKeyPath keyPath: String) -> SignalProducer<Any?, NoError> {
+	public func values(forKeyPath keyPath: String, options: NSKeyValueObservingOptions = [.initial, .new]) -> SignalProducer<Any?, NoError> {
 		return SignalProducer { observer, disposable in
 			disposable += KeyValueObserver.observe(
 				self.base,
 				keyPath: keyPath,
-				options: [.initial, .new],
+				options: options,
 				action: observer.send
 			)
 			disposable += self.lifetime.ended.observeCompleted(observer.sendCompleted)
