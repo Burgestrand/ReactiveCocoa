@@ -50,6 +50,42 @@ class LifetimeSpec: QuickSpec {
 			}
 		}
 
+		describe("Lifetime(of: AnyObject)") {
+			it("should work with Objective-C objects") {
+				var object: NSObject? = NSObject()
+				weak var weakObject = object
+				var isCompleted = false
+
+				let lifetime = Lifetime(of: object!)
+				lifetime.observeEnded { isCompleted = true }
+
+				expect(weakObject).toNot(beNil())
+				expect(isCompleted) == false
+
+				object = nil
+
+				expect(weakObject).to(beNil())
+				expect(isCompleted) == true
+			}
+
+			it("should work with native Swift objects") {
+				var object: Token? = Token()
+				weak var weakObject = object
+				var isCompleted = false
+
+				let lifetime = Lifetime(of: object!)
+				lifetime.observeEnded { isCompleted = true }
+
+				expect(weakObject).toNot(beNil())
+				expect(isCompleted) == false
+
+				object = nil
+
+				expect(weakObject).to(beNil())
+				expect(isCompleted) == true
+			}
+		}
+
 		describe("Signal.take(duringLifetimeOf:)") {
 			it("should work with Objective-C objects") {
 				var object: NSObject? = NSObject()

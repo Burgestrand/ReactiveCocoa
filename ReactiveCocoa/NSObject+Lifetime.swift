@@ -31,6 +31,20 @@ internal func lifetime(of object: AnyObject) -> Lifetime {
 	}
 }
 
+extension Lifetime {
+	/// Returns a lifetime that ends when the object is deallocated.
+	public convenience init(of object: AnyObject) {
+		let original = lifetime(of: object)
+
+		// The only available public initializer accepts a token, so we create
+		// a new token and connect its life to the original Lifetime.
+		let token = Lifetime.Token()
+		original.observeEnded { withExtendedLifetime(token) {} }
+
+		self.init(token)
+	}
+}
+
 extension Reactive where Base: AnyObject & NSObjectProtocol {
 	/// Returns a lifetime that ends when the object is deallocated.
 	@nonobjc public var lifetime: Lifetime {
